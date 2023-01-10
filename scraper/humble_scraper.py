@@ -4,7 +4,12 @@ import aiohttp
 import re
 from datetime import datetime
 from dateutil.relativedelta import *
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
+
+from .database import HumbleMonth, HumbleGame
+
+if TYPE_CHECKING:
+    from peewee import Query
 
 
 class HumbleScraper:
@@ -66,6 +71,7 @@ class HumbleChoiceMonth:
         self.year = year
         self.url = url
         self.games = []
+        self._db_entry: Optional['HumbleMonth'] = None
 
     def __eq__(self, o: object):
         if isinstance(o, HumbleChoiceMonth):
@@ -79,11 +85,20 @@ class HumbleChoiceMonth:
     def add_game(self, name: str):
         self.games.append(HumbleChoiceGame(name, self))
 
+    @property
+    def id(self):
+        return self._db_entry.id if self._db_entry else None
+
+    @property
+    def db_entry(self):
+        return self._db_entry
+
 
 class HumbleChoiceGame:
     def __init__(self, name: str, month: 'HumbleChoiceMonth'):
         self.name = name
         self.month = month
+        self._db_entry: Optional['HumbleGame'] = None
 
     def __eq__(self, o: object):
         if isinstance(o, HumbleChoiceGame):
@@ -93,3 +108,23 @@ class HumbleChoiceGame:
 
     def __repr__(self):
         return f'<HumbleChoiceGame: {self.name}>'
+
+    @property
+    def id(self):
+        return self._db_entry.id if self._db_entry else None
+
+    def save(self):
+        if self.month.db_entry is None:
+            raise ValueError('Month must be saved.')
+        if self._db_entry is None:
+            self._db_entry = HumbleGame(name=self.name, month=self.month.db_entry)
+            self._db_entry.save()
+        else:
+            self._db_entry.update(name=self.name, month=self.month.db_entry)
+            self._db_entry.save()
+
+    @staticmethod
+    def from_database(entry: HumbleGame, month: 'HumbleChoiceMonth'):
+        game = HumbleChoiceGame(entry.name, month)
+        game._db_entry = entry
+        return game
