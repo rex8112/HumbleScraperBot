@@ -18,8 +18,8 @@ class HumbleMonth(BaseModel):
 class HumbleGame(BaseModel):
     id = AutoField()
     name = TextField()
-    description = TextField()
-    image_url = TextField()
+    description = TextField(default='')
+    image_url = TextField(default='')
     month = ForeignKeyField(HumbleMonth, backref='games')
 
 
@@ -39,11 +39,11 @@ class User(BaseModel):
 
     def get_games(self):
         query = (HumbleGame
-                 .select()
+                 .select(HumbleGame)
                  .join(HumbleMonth)
                  .join(SubbedUserMonth)
                  .join(User)
-                 .where(User == self))
+                 .where(User.id == self.id))
         return query
 
 
