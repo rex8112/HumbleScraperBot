@@ -4,6 +4,11 @@ from peewee import *
 db = SqliteDatabase('humble.db')
 
 
+def initialize_database():
+    tables = [HumbleMonth, HumbleGame, RedeemedUserGame, SubbedUserMonth, User]
+    db.create_tables(tables)
+
+
 class BaseModel(Model):
     class Meta:
         database = db
@@ -13,7 +18,7 @@ class HumbleMonth(BaseModel):
     id = AutoField()
     month = IntegerField()
     year = IntegerField()
-    url = TextField(default='')
+    url = TextField(unique=True, index=True)
 
 
 class HumbleGame(BaseModel):
