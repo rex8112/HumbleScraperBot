@@ -1,4 +1,5 @@
 import asyncio
+import getopt
 import logging
 import os
 import sys
@@ -6,7 +7,7 @@ import sys
 import discord
 from discord.utils import setup_logging
 
-from scraper import ScraperBot
+from scraper import ScraperBot, HumbleScraper
 from scraper.tools import Config
 
 logger = logging.getLogger('HeliosLogger')
@@ -49,6 +50,18 @@ async def load_extensions():
 
 
 async def main():
+    opts, args = getopt.getopt(sys.argv[1:], 'sr', ['scrape', 'run'])
+    run_bot = False
+    for opt, arg in opts:
+        if opt in ['-s', '--scrape']:
+            scrapper = HumbleScraper()
+            r = await scrapper.initial_scrape()
+            [x.save() for x in r]
+        elif opt in ['-r', '--run']:
+            run_bot = True
+    if not run_bot:
+        await asyncio.sleep(0.1)
+        return
     async with bot:
         setup_logging()
         await load_extensions()
