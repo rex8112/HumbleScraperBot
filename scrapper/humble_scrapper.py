@@ -3,6 +3,8 @@ import asyncio
 import aiohttp
 import re
 from datetime import datetime
+
+import peewee
 from dateutil.relativedelta import *
 from typing import Optional, TYPE_CHECKING, Union
 
@@ -108,8 +110,11 @@ class HumbleChoiceMonth:
     def save(self):
         with db.atomic():
             if self._db_entry is None:
-                self._db_entry = HumbleMonth(month=month_to_int(self.month), year=self.year, url=self.url)
-                self._db_entry.save()
+                try:
+                    self._db_entry = HumbleMonth.get(HumbleMonth.url == self.url)
+                except peewee.DoesNotExist:
+                    self._db_entry = HumbleMonth(month=month_to_int(self.month), year=self.year, url=self.url)
+                    self._db_entry.save()
             else:
                 self._db_entry.update(month=month_to_int(self.month), year=self.year, url=self.url)
                 self._db_entry.save()
@@ -148,8 +153,11 @@ class HumbleChoiceGame:
         if self.month.db_entry is None:
             raise ValueError('Month must be saved.')
         if self._db_entry is None:
-            self._db_entry = HumbleGame(name=self.name, month=self.month.db_entry)
-            self._db_entry.save()
+            try:
+                self._db_entry = HumbleGame.get(HumbleGame.month == self.month.id and HumbleGame.name == self.name)
+            except peewee.DoesNotExist:
+                self._db_entry = HumbleGame(name=self.name, month=self.month.db_entry)
+                self._db_entry.save()
         else:
             self._db_entry.update(name=self.name, month=self.month.db_entry)
             self._db_entry.save()
