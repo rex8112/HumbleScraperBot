@@ -38,11 +38,6 @@ async def on_ready():
     print('-----')'''
 
 
-if not bot.settings.token:
-    print('Token not found, please fill out config.json.')
-    sys.exit()
-
-
 async def load_extensions():
     for name in os.listdir('./cogs'):
         if name.endswith('.py'):
@@ -56,6 +51,7 @@ async def main():
         if opt in ['-s', '--scrape']:
             scrapper = HumbleScraper()
             r = await scrapper.initial_scrape()
+            await scrapper.session.close()
             [x.save() for x in r]
         elif opt in ['-r', '--run']:
             run_bot = True
@@ -63,6 +59,9 @@ async def main():
         await asyncio.sleep(0.1)
         return
     async with bot:
+        if not bot.settings.token:
+            print('Token not found, please fill out config.json.')
+            sys.exit()
         setup_logging()
         await load_extensions()
         await bot.start(bot.settings.token)
