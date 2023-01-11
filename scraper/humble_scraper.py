@@ -4,9 +4,9 @@ import aiohttp
 import re
 from datetime import datetime
 from dateutil.relativedelta import *
-from typing import Optional, TYPE_CHECKING
+from typing import Optional, TYPE_CHECKING, Union
 
-from .database import HumbleMonth, HumbleGame
+from .database import HumbleMonth, HumbleGame, db
 
 if TYPE_CHECKING:
     from peewee import Query
@@ -65,12 +65,24 @@ class HumbleScraper:
         return all_results
 
 
+def month_to_str(month: int):
+    if isinstance(month, str):
+        return month
+    return datetime(2023, month, 1).strftime('%B').lower()
+
+
+def month_to_int(month: str):
+    if isinstance(month, int):
+        return month
+    return datetime.strptime(month, '%B').month
+
+
 class HumbleChoiceMonth:
     def __init__(self, month: str, year: int, url: str):
         self.month = month
         self.year = year
         self.url = url
-        self.games = []
+        self.games: list['HumbleChoiceGame'] = []
         self._db_entry: Optional['HumbleMonth'] = None
 
     def __eq__(self, o: object):
@@ -82,8 +94,8 @@ class HumbleChoiceMonth:
     def __repr__(self):
         return f'<HumbleChoiceMonth: {self.month} of {self.year}>'
 
-    def add_game(self, name: str):
-        self.games.append(HumbleChoiceGame(name, self))
+    def add_game(self, game: 'HumbleChoiceGame'):
+        self.games.append(game)
 
     @property
     def id(self):
@@ -92,6 +104,25 @@ class HumbleChoiceMonth:
     @property
     def db_entry(self):
         return self._db_entry
+
+    def save(self):
+        with db.atomic():
+            if self._db_entry is None:
+                self._db_entry = HumbleMonth(month=month_to_int(self.month), year=self.year, url=self.url)
+                self._db_entry.save()
+            else:
+                self._db_entry.update(month=month_to_int(self.month), year=self.year, url=self.url)
+                self._db_entry.save()
+            for game in self.games:
+                game.save()
+
+    @classmethod
+    def from_database(cls, entry: HumbleMonth):
+        month = cls(month_to_str(entry.month), entry.year, entry.url)
+        month._db_entry = entry
+        for game in entry.games:
+            month.add_game(HumbleChoiceGame.from_database(game, month))
+        return month
 
 
 class HumbleChoiceGame:
@@ -123,8 +154,8 @@ class HumbleChoiceGame:
             self._db_entry.update(name=self.name, month=self.month.db_entry)
             self._db_entry.save()
 
-    @staticmethod
-    def from_database(entry: HumbleGame, month: 'HumbleChoiceMonth'):
-        game = HumbleChoiceGame(entry.name, month)
+    @classmethod
+    def from_database(cls, entry: HumbleGame, month: 'HumbleChoiceMonth'):
+        game = cls(entry.name, month)
         game._db_entry = entry
         return game
