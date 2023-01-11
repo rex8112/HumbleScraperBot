@@ -43,7 +43,7 @@ class HumbleScraper:
         humble_month = HumbleChoiceMonth(month, year, str(response.url))
         self.months.append(humble_month)
         for name in results:
-            humble_month.add_game(name)
+            humble_month.add_game(HumbleChoiceGame(name, humble_month))
         return humble_month if humble_month.games else None
 
     async def initial_scrape(self):
