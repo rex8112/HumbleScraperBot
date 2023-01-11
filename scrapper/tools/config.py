@@ -35,11 +35,7 @@ class Config:
     def save(self):
         data = {
             'token': self.token,
-            'owner': self.owner,
-            'api_url': self.api_url,
-            'api_username': self.api_username,
-            'api_password': self.api_password,
-            'randomname_api_key': self.randomname_api_key
+            'owner': self.owner
         }
         self._serialize(data)
 
