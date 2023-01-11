@@ -8,6 +8,7 @@ import discord
 from discord.utils import setup_logging
 
 from scrapper import ScraperBot, HumbleScraper
+from scrapper.database import initialize_database
 from scrapper.tools import Config
 
 logger = logging.getLogger('HeliosLogger')
@@ -49,6 +50,7 @@ async def main():
     run_bot = False
     for opt, arg in opts:
         if opt in ['-s', '--scrape']:
+            initialize_database()
             scrapper = HumbleScraper()
             r = await scrapper.initial_scrape()
             await scrapper.session.close()
