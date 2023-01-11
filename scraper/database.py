@@ -13,6 +13,7 @@ class HumbleMonth(BaseModel):
     id = AutoField()
     month = IntegerField()
     year = IntegerField()
+    url = TextField(default='')
 
 
 class HumbleGame(BaseModel):
