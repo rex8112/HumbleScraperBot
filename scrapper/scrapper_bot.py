@@ -4,7 +4,7 @@ from typing import Optional
 import discord
 from discord.ext import commands
 
-from .humble_scraper import HumbleScraper
+from .humble_scrapper import HumbleScraper
 from .tools import Config
 
 logger = logging.getLogger('HeliosLogger')

@@ -7,8 +7,8 @@ import sys
 import discord
 from discord.utils import setup_logging
 
-from scraper import ScraperBot, HumbleScraper
-from scraper.tools import Config
+from scrapper import ScraperBot, HumbleScraper
+from scrapper.tools import Config
 
 logger = logging.getLogger('HeliosLogger')
 logger.setLevel(logging.DEBUG)
