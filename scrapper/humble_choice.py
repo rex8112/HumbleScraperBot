@@ -1,9 +1,10 @@
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Any
 
 import peewee
 
-from scrapper.database import HumbleMonth, db, HumbleGame
+from .database import HumbleMonth, db, HumbleGame
+from .views import HumbleGameView
 
 
 def month_to_str(month: int):
@@ -95,6 +96,11 @@ class HumbleChoiceGame:
     @property
     def id(self):
         return self._db_entry.id if self._db_entry else None
+
+    @property
+    def message_payload(self) -> dict[str, Any]:
+        embeds = []
+        return {'embeds': embeds, 'view': HumbleGameView(self)}
 
     def save(self):
         if self.month.db_entry is None:
