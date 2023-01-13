@@ -24,7 +24,7 @@ class HumbleChoiceMonth:
         self.month = month
         self.year = year
         self.url = url
-        self.games: list['HumbleChoiceGame'] = []
+        self.games: dict[str, 'HumbleChoiceGame'] = {}
         self._db_entry: Optional['HumbleMonth'] = None
 
     def __eq__(self, o: object):
@@ -37,7 +37,8 @@ class HumbleChoiceMonth:
         return f'<HumbleChoiceMonth: {self.month} of {self.year}>'
 
     def add_game(self, game: 'HumbleChoiceGame'):
-        self.games.append(game)
+        name = game.name.lower()
+        self.games[name] = game
 
     @property
     def id(self):

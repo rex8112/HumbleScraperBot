@@ -13,7 +13,7 @@ if TYPE_CHECKING:
     pass
 
 
-class HumbleScraper:
+class HumbleScrapper:
     BASE_URL = 'https://www.humblebundle.com/'
     FIRST_HUMBLE = datetime(month=10, year=2015, day=1)
 

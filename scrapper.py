@@ -7,7 +7,7 @@ import sys
 import discord
 from discord.utils import setup_logging
 
-from scrapper import ScraperBot, HumbleScraper
+from scrapper import ScrapperBot, HumbleScrapper
 from scrapper.database import initialize_database
 from scrapper.tools import Config
 
@@ -30,7 +30,7 @@ intents.members = True
 intents.message_content = True
 
 settings = Config.from_file_path()
-bot = ScraperBot(command_prefix='?', description=description, intents=intents, settings=settings)
+bot = ScrapperBot(command_prefix='?', description=description, intents=intents, settings=settings)
 
 
 '''@bot.event
@@ -51,7 +51,7 @@ async def main():
     for opt, arg in opts:
         if opt in ['-s', '--scrape']:
             initialize_database()
-            scrapper = HumbleScraper()
+            scrapper = HumbleScrapper()
             r = await scrapper.initial_scrape()
             await scrapper.session.close()
             [x.save() for x in r]

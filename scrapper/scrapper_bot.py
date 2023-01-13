@@ -4,19 +4,17 @@ from typing import Optional
 import discord
 from discord.ext import commands
 
-from .humble_scrapper import HumbleScraper
+from .humble_scrapper import HumbleScrapper
 from .humble_choice import HumbleChoiceMonth
 from .tools import Config
 
 logger = logging.getLogger('HeliosLogger')
 
 
-class ScraperBot(commands.Bot):
+class ScrapperBot(commands.Bot):
     def __init__(self, command_prefix, *, intents, settings: Config, **options):
         self.settings = settings
         self.ready_once = True
-        self.scraper = HumbleScraper()
-        self.months: dict[str, 'HumbleChoiceMonth'] = HumbleChoiceMonth.get_all()
 
         super().__init__(command_prefix, intents=intents, **options)
 

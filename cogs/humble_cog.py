@@ -4,14 +4,30 @@ import discord
 from discord import app_commands
 from discord.ext import commands
 from fast_autocomplete import AutoComplete
+from scrapper import HumbleChoiceMonth, HumbleScrapper, HumbleChoiceGame
 
 if TYPE_CHECKING:
-    from scrapper import ScraperBot
+    from scrapper import ScrapperBot
 
 
-class TopicCog(commands.Cog):
-    def __init__(self, bot: 'ScraperBot'):
+class HumbleCog(commands.Cog):
+    def __init__(self, bot: 'ScrapperBot'):
         self.bot = bot
+        self.scraper = HumbleScrapper()
+        self.months: dict[str, 'HumbleChoiceMonth'] = {}
+        self.game_index: dict[str, 'HumbleChoiceGame'] = {}
+        self.autocomplete = None
+        self.rebuild_autocomplete()
+
+    def rebuild_autocomplete(self):
+        game_index = {}
+        for month in self.months.values():
+            game_index.update(**month.games)
+        self.game_index = game_index
+        ac_names = {}
+        for name in self.game_index.keys():
+            ac_names[name] = {}
+        self.autocomplete = AutoComplete(ac_names)
 
     @app_commands.command(name='search', description='Search for a Humble Choice Game')
     async def search(
@@ -32,5 +48,5 @@ class TopicCog(commands.Cog):
         ]
 
 
-async def setup(bot: 'ScraperBot'):
-    await bot.add_cog(TopicCog(bot))
+async def setup(bot: 'ScrapperBot'):
+    await bot.add_cog(HumbleCog(bot))
