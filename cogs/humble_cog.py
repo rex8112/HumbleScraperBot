@@ -40,7 +40,7 @@ class HumbleCog(commands.Cog):
     ):
         game = self.game_index.get(name)
         if game:
-            await interaction.response.send_message(f'Found: {game.month.url}')
+            await interaction.response.send_message(**game.message_payload)
         else:
             await interaction.response.send_message('Not Found')
 

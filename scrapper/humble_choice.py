@@ -1,6 +1,7 @@
 from datetime import datetime
 from typing import Optional, Any
 
+import discord
 import peewee
 
 from .database import HumbleMonth, db, HumbleGame
@@ -100,8 +101,19 @@ class HumbleChoiceGame:
 
     @property
     def message_payload(self) -> dict[str, Any]:
-        embeds = []
+        embeds = self.get_embeds()
         return {'embeds': embeds, 'view': HumbleGameView(self)}
+
+    def get_embeds(self):
+        old = self.month.url.endswith('monthly')
+        embed = discord.Embed(colour=discord.Colour.orange(), title=self.name)
+        embed.set_footer(text=f'Humble Bundle {"Monthly" if old else "Choice"}: {self.month.month} {self.month.year}')
+        if old:
+            embed.add_field(name="Can't find the key?",
+                            value='Old Humble Bundle Monthlies immediately put all the keys into your '
+                                  '[library](https://www.humblebundle.com/home/library). '
+                                  'You will have to find your key there.')
+        return [embed]
 
     def save(self):
         if self.month.db_entry is None:
