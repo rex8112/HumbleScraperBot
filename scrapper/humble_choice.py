@@ -59,7 +59,7 @@ class HumbleChoiceMonth:
             else:
                 self._db_entry.update(month=month_to_int(self.month), year=self.year, url=self.url)
                 self._db_entry.save()
-            for game in self.games:
+            for game in self.games.values():
                 game.save()
 
     @classmethod

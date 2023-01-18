@@ -7,7 +7,7 @@ from datetime import datetime
 from dateutil.relativedelta import *
 from typing import Optional, TYPE_CHECKING
 
-from . import HumbleChoiceMonth, HumbleChoiceGame
+from .humble_choice import HumbleChoiceMonth, HumbleChoiceGame
 
 if TYPE_CHECKING:
     pass
@@ -47,7 +47,7 @@ class HumbleScrapper:
             humble_month.add_game(HumbleChoiceGame(name, humble_month))
         return humble_month if humble_month.games else None
 
-    async def initial_scrape(self):
+    async def initial_scrape(self) -> list['HumbleChoiceMonth']:
         self.months.clear()
         date = self.FIRST_HUMBLE
         tasks = []

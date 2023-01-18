@@ -17,6 +17,9 @@ class HumbleCog(commands.Cog):
         self.months: dict[str, 'HumbleChoiceMonth'] = {}
         self.game_index: dict[str, 'HumbleChoiceGame'] = {}
         self.autocomplete = None
+
+    async def cog_load(self) -> None:
+        self.months = HumbleChoiceMonth.get_all()
         self.rebuild_autocomplete()
 
     def rebuild_autocomplete(self):
@@ -35,15 +38,17 @@ class HumbleCog(commands.Cog):
             interaction: discord.Interaction,
             name: str
     ):
-        ...
+        game = self.game_index.get(name)
+        if game:
+            await interaction.response.send_message(f'Found: {game.month.url}')
+        else:
+            await interaction.response.send_message('Not Found')
 
     @search.autocomplete('name')
     async def name_autocomplete(self, interaction: discord.Interaction, current: str):
-        names = []
-        autocomplete = AutoComplete(names)
-        results = autocomplete.search(current, max_cost=3, size=25)
+        results = self.autocomplete.search(current, max_cost=3, size=25)
         return [
-            app_commands.Choice(name=x, value=x)
+            app_commands.Choice(name=x[0], value=x[0])
             for x in results
         ]
 
