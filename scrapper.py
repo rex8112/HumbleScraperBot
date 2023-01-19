@@ -11,7 +11,7 @@ from scrapper import ScrapperBot, HumbleScrapper
 from scrapper.database import initialize_database, db
 from scrapper.tools import Config
 
-logger = logging.getLogger('HeliosLogger')
+logger = logging.getLogger('ScrapperBotLogger')
 logger.setLevel(logging.DEBUG)
 consoleHandler = logging.StreamHandler()
 consoleHandler.setLevel(logging.DEBUG)

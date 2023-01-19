@@ -9,7 +9,7 @@ from .humble_scrapper import HumbleScrapper
 from .humble_choice import HumbleChoiceMonth
 from .tools import Config
 
-logger = logging.getLogger('HeliosLogger')
+logger = logging.getLogger('ScrapperBotLogger')
 
 
 class ScrapperBot(commands.Bot):
