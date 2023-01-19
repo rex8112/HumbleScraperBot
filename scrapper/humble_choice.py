@@ -116,17 +116,24 @@ class HumbleChoiceGame:
         return [embed]
 
     def save(self):
-        if self.month.db_entry is None:
-            raise ValueError('Month must be saved.')
-        if self._db_entry is None:
-            try:
-                self._db_entry = HumbleGame.get(HumbleGame.month == self.month.id and HumbleGame.name == self.name)
-            except peewee.DoesNotExist:
-                self._db_entry = HumbleGame(name=self.name, month=self.month.db_entry)
-                self._db_entry.save()
-        else:
-            self._db_entry.update(name=self.name, month=self.month.db_entry)
-            self._db_entry.save()
+        with db.atomic():
+            if self.month.db_entry is None:
+                raise ValueError('Month must be saved.')
+            if self._db_entry is None:
+                try:
+                    self._db_entry = HumbleGame.get(HumbleGame.month == self.month.id and HumbleGame.name == self.name)
+                except peewee.DoesNotExist:
+                    self._db_entry = HumbleGame(name=self.name, month=self.month.db_entry)
+                    self._db_entry.save()
+                else:
+                    self.db_update()
+            else:
+                self.db_update()
+
+    def db_update(self):
+        self._db_entry.name = self.name
+        self._db_entry.month = self.month.db_entry
+        self._db_entry.save()
 
     @classmethod
     def from_database(cls, entry: HumbleGame, month: 'HumbleChoiceMonth'):

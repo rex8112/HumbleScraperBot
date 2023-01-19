@@ -26,6 +26,6 @@ class HumbleGameView(View):
     def __init__(self, game: 'HumbleChoiceGame'):
         self.game = game
         l_button = Button(style=discord.ButtonStyle.url, label='Link', url=self.game.month.url, row=1)
-        self.add_item(l_button)
         super().__init__(timeout=60)
+        self.add_item(l_button)
 
