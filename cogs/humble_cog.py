@@ -1,8 +1,9 @@
+from datetime import time
 from typing import TYPE_CHECKING, Optional
 
 import discord
 from discord import app_commands
-from discord.ext import commands
+from discord.ext import commands, tasks
 from fast_autocomplete import AutoComplete
 from scrapper import HumbleChoiceMonth, HumbleScrapper, HumbleChoiceGame
 
@@ -51,6 +52,17 @@ class HumbleCog(commands.Cog):
             app_commands.Choice(name=x[0], value=x[0])
             for x in results
         ]
+
+    @tasks.loop(time=time(hour=3, minute=0))
+    async def scrape_current_month(self):
+        month, year = self.scraper.get_current_month_year()
+        result = await self.scraper.scrape(month, year)
+        if result is None or self.months.get(result.url):
+            print('No new month found')
+            return
+        self.months[result.url] = result
+        result.save()
+        print(f'Building new month {result.month} {result.year}')
 
 
 async def setup(bot: 'ScrapperBot'):
