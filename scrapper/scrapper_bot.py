@@ -3,6 +3,7 @@ from typing import Optional
 
 import discord
 from discord.ext import commands
+from discord.utils import find
 
 from .humble_scrapper import HumbleScrapper
 from .humble_choice import HumbleChoiceMonth
@@ -25,6 +26,12 @@ class ScrapperBot(commands.Bot):
         logger.info(f'Logged in as {self.user} (ID: {self.user.id})')
         if self.ready_once:
             ...
+
+    async def message_owner(self, **message_kwargs) -> Optional[discord.Message]:
+        owner = find(lambda x: x.id == self.owner_id, self.users)
+        if owner:
+            return await owner.send(**message_kwargs)
+        return None
 
     @staticmethod
     async def on_slash_error(

@@ -54,16 +54,16 @@ class HumbleCog(commands.Cog):
             for x in results
         ]
 
-    @tasks.loop(time=time(hour=3, minute=0))
+    @tasks.loop(time=time(hour=9, minute=0))
     async def scrape_current_month(self):
         month, year = self.scrapper.get_current_month_year()
         result = await self.scrapper.scrape(month, year)
-        if result is None or self.months.get(result.url):
-            print('No new month found')
+        if result is None or self.months.get(result.url) is not None:
+            await self.bot.message_owner(content='No new month found')
             return
         self.months[result.url] = result
         result.save()
-        print(f'Building new month {result.month} {result.year}')
+        await self.bot.message_owner(content=f'Found new month {result.month} {result.year}')
 
 
 async def setup(bot: 'ScrapperBot'):
