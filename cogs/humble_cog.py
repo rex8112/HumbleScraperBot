@@ -14,10 +14,11 @@ if TYPE_CHECKING:
 class HumbleCog(commands.Cog):
     def __init__(self, bot: 'ScrapperBot'):
         self.bot = bot
-        self.scraper = HumbleScrapper()
+        self.scrapper = HumbleScrapper()
         self.months: dict[str, 'HumbleChoiceMonth'] = {}
         self.game_index: dict[str, 'HumbleChoiceGame'] = {}
         self.autocomplete = None
+        self.scrape_current_month.start()
 
     async def cog_load(self) -> None:
         self.months = HumbleChoiceMonth.get_all()
@@ -55,8 +56,8 @@ class HumbleCog(commands.Cog):
 
     @tasks.loop(time=time(hour=3, minute=0))
     async def scrape_current_month(self):
-        month, year = self.scraper.get_current_month_year()
-        result = await self.scraper.scrape(month, year)
+        month, year = self.scrapper.get_current_month_year()
+        result = await self.scrapper.scrape(month, year)
         if result is None or self.months.get(result.url):
             print('No new month found')
             return
