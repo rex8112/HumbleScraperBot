@@ -27,10 +27,12 @@ description = '''A Humble Bundle Choice Scraper'''
 
 intents = discord.Intents.default()
 intents.members = True
-intents.message_content = True
+
+activity = discord.Activity(name='/search', type=discord.ActivityType.listening)
 
 settings = Config.from_file_path()
-bot = ScrapperBot(command_prefix='?', description=description, intents=intents, settings=settings)
+bot = ScrapperBot(command_prefix='?', description=description, intents=intents,
+                  settings=settings, activity=activity)
 
 
 '''@bot.event
