@@ -27,8 +27,13 @@ class ScrapperBot(commands.Bot):
         if self.ready_once:
             ...
 
+    async def get_owner(self) -> discord.User:
+        for user in self.users:
+            if await self.is_owner(user):
+                return user
+
     async def message_owner(self, **message_kwargs) -> Optional[discord.Message]:
-        owner = find(lambda x: x.id == self.owner_id, self.users)
+        owner = await self.get_owner()
         if owner:
             return await owner.send(**message_kwargs)
         return None

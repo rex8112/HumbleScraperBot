@@ -65,6 +65,10 @@ class HumbleCog(commands.Cog):
         result.save()
         await self.bot.message_owner(content=f'Found new month {result.month} {result.year}')
 
+    @scrape_current_month.before_loop
+    async def before_scrape(self):
+        await self.bot.wait_until_ready()
+
 
 async def setup(bot: 'ScrapperBot'):
     await bot.add_cog(HumbleCog(bot))
