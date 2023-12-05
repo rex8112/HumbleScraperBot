@@ -1,3 +1,4 @@
+import traceback
 from datetime import time
 from typing import TYPE_CHECKING, Optional
 
@@ -68,6 +69,10 @@ class HumbleCog(commands.Cog):
     @scrape_current_month.before_loop
     async def before_scrape(self):
         await self.bot.wait_until_ready()
+
+    @scrape_current_month.error
+    async def scrape_error(self, error):
+        await self.bot.message_owner(content=f'```{traceback.format_exc()}```')
 
 
 async def setup(bot: 'ScrapperBot'):
