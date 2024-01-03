@@ -64,6 +64,7 @@ class HumbleCog(commands.Cog):
             return
         self.months[result.url] = result
         result.save()
+        self.rebuild_autocomplete()
         await self.bot.message_owner(content=f'Found new month {result.month} {result.year}')
 
     @scrape_current_month.before_loop
