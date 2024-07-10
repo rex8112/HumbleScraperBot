@@ -60,7 +60,7 @@ class HumbleCog(commands.Cog):
         month, year = self.scrapper.get_current_month_year()
         result = await self.scrapper.scrape(month, year)
         if result is None or self.months.get(result.url) is not None:
-            await self.bot.message_owner(content='No new month found')
+            # await self.bot.message_owner(content='No new month found')
             return
         self.months[result.url] = result
         result.save()
